@@ -3,6 +3,7 @@ Flask >= 0.12
 Flask-Socketio >= 2.8.6
 
 Flask-Mysql >= 1.4.0
+Flask-SqlAlchemy >=2.2
 
 # Mongo Database
 Flask-PyMongo >= 0.4.1
