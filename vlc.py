@@ -63,4 +63,4 @@ def hadleMessage(msg):
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=9527)
+    socketio.run(app, port=9527)
