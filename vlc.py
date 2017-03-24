@@ -1,43 +1,35 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
-from flask_socketio import SocketIO, send
+from flask import Flask, render_template
+from flask_socketio import SocketIO, send, emit
 from flask_bootstrap import Bootstrap
-from flask_wtf import Form
+from flask_sqlalchemy import SQLAlchemy
 
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
-from wtforms.validators import InputRequired, Email, Length
-
-from flaskext.mysql import MySQL
+from datetime import datetime
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'Thisissupposedtobesecret!'
-
-app.config['MYSQL_DATABASE_HOST'] = '127.0.0.1'
-app.config['MYSQL_DATABASE_PORT'] = 3306
-app.config['MYSQL_DATABASE_DB'] = 'vlc'
-app.config['MYSQL_DATABASE_USER'] = 'root'
-app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
+# URI format: dialect+driver://username:password@host:port/database
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:root@127.0.0.1:3306/vlc'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
 Bootstrap(app)
 
-mysql = MySQL()
-mysql.init_app(app)
+db = SQLAlchemy(app)
 
 socketio = SocketIO(app)
 
 
+class Pool(db.Model):
+    __tablename__ = "student_pool"
+    id = db.Column('id', db.Integer, primary_key=True)
+    user_id = db.Column('user_id', db.String(50))
+    user_name = db.Column('user_name', db.String(50))
+    start_ts = db.Column('start_ts', db.DateTime, default=datetime.utcnow)
+
+
 @app.route('/db_test')
 def db_test():
-    conn = mysql.connect()
-    cur = conn.cursor()
-    data = None
-    try:
-        cur.execute("SELECT * FROM student_pool")
-        data = cur.fetchall()
-    except Exception as error:
-        print 'Read database failed: ', error
-    finally:
-        cur.close()
+    data = Pool.query.all()
     return render_template('vlc_db_test.html', title="DB Test", data=data)
 
 
@@ -56,7 +48,7 @@ def tutor():
     return render_template('vlc_tutor.html', title="Tutor")
 
 
-@socketio('message')
+@socketio.on('message')
 def hadleMessage(msg):
     print msg
     send(msg, broadcast=True)

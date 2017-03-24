@@ -21,13 +21,13 @@
             {% for item in data %}
                 <div class="row">
                     <div class="col-md-3">
-                        {{ item[1] }}
+                        {{ item.user_id }}
                     </div>
                     <div class="col-md-3">
-                        {{item[2]}}
+                        {{item.user_name}}
                     </div>
                     <div class="col-md-3">
-                        {{item[3]}}
+                        {{item.start_ts}}
                     </div>
                 </div>
             {% endfor %}
