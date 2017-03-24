@@ -1,7 +1,36 @@
 {% extends "base.html" %}
-
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock %}
 {% block page_content %}
     <h1>{{ title }}</h1>
-
+    <input type="text" id="username">
+    <button id="start">Start</button>
+    <button id="end">End</button>
     <a href="{{ url_for('index') }}">back</a>
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var socket = io.connect('http://127.0.0.1:9527');
+
+            $('#start').on('click', function () {
+                //$("#start").prop("disabled",true);
+                //$("#end").prop("disabled",false);
+                socket.emit('action', "start " + $('#username').val());
+            });
+
+            $('#end').on('click', function () {
+                //$("#start").prop("disabled",false);
+                //$("#end").prop("disabled",true);
+                socket.emit('action', "end " + $('#username').val());
+            });
+
+            socket.on('response', function (result) {
+                Console.writeln(result);
+            });
+        });
+    </script>
 {% endblock %}

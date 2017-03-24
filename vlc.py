@@ -48,9 +48,20 @@ def tutor():
     return render_template('vlc_tutor.html', title="Tutor")
 
 
-@socketio.on('message')
+@socketio.on('action')
 def hadleMessage(msg):
-    print msg
+    arg = msg.split(" ")
+    action = arg[0]
+    user_name = arg[1]
+    if action == "start":
+        p = Pool(user_id=user_name, user_name=user_name)
+        db.session.add(p)
+        db.session.commit()
+    elif action == "end":
+        p = Pool.query.filter_by(user_name=user_name).first()
+        db.session.delete(p)
+        db.session.commit()
+
     send(msg, broadcast=True)
 
 

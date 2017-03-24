@@ -1,6 +1,60 @@
 {% extends "base.html" %}
-
+{% block head %}
+    {{ super() }}
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% endblock %}
 {% block page_content %}
     <h1>{{ title }}</h1>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">There are {{ data|length }} students waiting.</h3>
+        </div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-3">
+                    user ID
+                </div>
+                <div class="col-md-3">
+                    User Name
+                </div>
+                <div class="col-md-3">
+                    Time
+                </div>
+            </div>
+            {% for item in data %}
+                <div class="row">
+                    <div class="col-md-3">
+                        {{ item.user_id }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ item.user_name }}
+                    </div>
+                    <div class="col-md-3">
+                        {{ item.start_ts }}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            var socket = io.connect('http://127.0.0.1:9527');
+            socket.on('connect', function () {
+                socket.send("User has connected!");
+            })
+
+            socket.on('message', function (msg) {
+                $("#message").append("<li>" + msg + "</li>");
+            })
+
+            $('#sendbutton').on('click', function () {
+                socket.send($('#myMessage').val());
+                $('#myMessage').val('');
+            });
+
+        });
+    </script>
     <a href="{{ url_for('index') }}">back</a>
 {% endblock %}
